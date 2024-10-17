@@ -1,7 +1,3 @@
-export function waitFor(time: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, time));
-}
-
 export function formatPokemonName(name: string): string {
   if (name.includes("♀")) {
     return name.replace("♀", "-f");
@@ -14,4 +10,8 @@ export function formatPokemonName(name: string): string {
   } else {
     return name;
   }
+}
+
+export function waitFor(time: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, time));
 }
