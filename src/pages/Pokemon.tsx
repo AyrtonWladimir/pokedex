@@ -1,12 +1,34 @@
 import { useParams, useNavigate } from "react-router-dom";
 import goBack from "../assets/pokeball.png";
 import Footer from "../components/Footer";
-import bulbasaurImg from '../assets/bulbasaur.gif'
 import styles from '../pages/pokemon.module.css'
+import { useEffect, useState } from "react";
+import { PokemonDetails } from "../types/types";
+import { fetchPokemon } from "../api/fetchPokemon";
+import { waitFor } from "../utils/utils";
+import LoadingScreen from "../components/LoadingScreen";
 
 const Pokemon = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [pokemon, setPokemon] = useState<PokemonDetails>();
   const { name } = useParams();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    async function getPokemon() {
+      setIsLoading(true);
+      await waitFor(500);
+      const fetchedPokemon = await fetchPokemon(name as string);
+      setPokemon(fetchedPokemon);
+      setIsLoading(false);
+    }
+    getPokemon();
+  }, [name]);
+
+  if(isLoading||!pokemon){
+    return <LoadingScreen></LoadingScreen>
+  }
+
   return (
     <>
     <button className={styles.pokeballButton} onClick={() => navigate(-1)}>
@@ -15,18 +37,20 @@ const Pokemon = () => {
     </button>
     <div className={styles.pokemon}>
       <main className={styles.pokemonInfo}>
-        <div className={styles.pokemonTitle}>{name?.toUpperCase()}</div>
-        <div>Nr. 001</div>
+        <div className={styles.pokemonTitle}>
+          {pokemon?.name?.toUpperCase()}
+        </div>
+        <div>Nr. {pokemon?.id}</div>
         <div>
           <img
             className={styles.pokemonInfoImg}
-            src={bulbasaurImg}
-            alt="bulbasaur"
+            src={pokemon?.imgSrc}
+            alt={pokemon?.name}
           />
         </div>
-        <div>HP: 00</div>
-        <div>Attack: 20</div>
-        <div>Defense: 40</div>
+        <div>HP: {pokemon?.hp}</div>
+        <div>Attack: {pokemon?.attack}</div>
+        <div>Defense: {pokemon?.defense}</div>
       </main>
     </div>
     <Footer />
